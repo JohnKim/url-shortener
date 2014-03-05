@@ -1,0 +1,13 @@
+{
+
+  "main":"io.stalk.mods.shortener.ServerVerticle",
+
+  "description":"URL Shortener API Server",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "John Kim",
+
+  "keywords": ["url", "shortener"],
+  "homepage": "url.stalk.io",
+
+  "auto-redeploy": true
+}
