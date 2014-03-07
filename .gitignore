@@ -1,7 +1,5 @@
 .DS_Store
 *.class
-mod-shortener-server/target
-mod-shortener-persister/target
 
 # Package Files #
 *.jar
