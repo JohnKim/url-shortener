@@ -6,7 +6,7 @@
   <groupId>io.stalk</groupId>
   <artifactId>mod-shortener-server</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.8</version>
   <name>Project - mod-shortener-server</name>
   <url>http://maven.apache.org</url>
 

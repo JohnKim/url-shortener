@@ -1,13 +1,14 @@
 {
 
-  "main":"io.stalk.mods.shortener.ServerVerticle",
+  "main":"io.stalk.mod.shortener.server.ServerVerticle",
 
-  "description":"URL Shortener API Server",
+  "description":"Mongodb Persister for url shortener",
   "licenses": ["The Apache Software License Version 2.0"],
   "author": "John Kim",
 
-  "keywords": ["url", "shortener"],
+  "keywords": ["url"],
   "homepage": "url.stalk.io",
-
+  
   "auto-redeploy": true
+  
 }

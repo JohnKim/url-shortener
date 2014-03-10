@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free coming soon template with jQuery countdown">
+    <meta name="author" content="http://bootstraptaste.com">
+
+    <title>Webuild - Free Bootstrap coming soon template with countdown</title>
+
+    <!-- Bootstrap -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-theme.css" rel="stylesheet">
+
+    <!-- siimple style -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div id="wrapper">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <h1>URL Shortener for VERT.X modules</h1>
+            <h2 class="subtitle">It is a small vert.x module that will allow you to run your own URL shortening service.</h2>
+            
+            <form class="form-inline signup" id="createUrl" role="form">
+              <div class="form-group">
+                <input type="url" class="form-control" id="longUrl" placeholder="Enter your long URL">
+              </div>
+              <button type="submit" class="btn btn-theme">Shorten !</button>
+            </form>		
+
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-lg-6 col-lg-offset-3">
+            <h2 class="resultUrl" ><strong id="shortUrl"></strong></h2>
+          </div>
+        </div>		
+        
+        <div class="row">
+          <div class="col-lg-6 col-lg-offset-3">
+            <p class="copyright">Copyright &copy; 2014</p>
+          </div>
+        </div>		
+        
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+      var APP_URL = 'http://url.stalk.io:8888';
+
+
+      $( "#createUrl" ).submit(function( event ) {
+
+        event.preventDefault();
+
+        var longUrl = $('#longUrl').val();
+        console.log(APP_URL + '/url/' + encodeURIComponent(longUrl));
+
+        $.ajax({
+          url: APP_URL + '/url/' + encodeURIComponent(longUrl)
+          , crossDomain: true
+          , dataType: "jsonp"
+          , type: 'GET'
+          , data: {}
+          , success: success
+          , error: function(jqXHR, textStatus, errorThrown){
+            alert(errorThrown);
+          }
+        });
+
+      });
+
+      var success = function(data){
+
+        console.log(data);
+
+        $('#shortUrl').text(APP_URL +'/' +data.key);
+        selectText('shortUrl');
+
+      };
+      
+      
+      var selectText = function(element) {
+        var doc = document
+        , text = doc.getElementById(element)
+        , range, selection;
+        
+        if (doc.body.createTextRange) {
+          range = document.body.createTextRange();
+          range.moveToElementText(text);
+          range.select();
+        } else if (window.getSelection) {
+          selection = window.getSelection();        
+          range = document.createRange();
+          range.selectNodeContents(text);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+
+
+    </script>
+    
+    <!-- GitHub Ribbon -->
+    <a href="https://github.com/JohnKim/url-shortener"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github-camo.global.ssl.fastly.net/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    
+  </body>
+</html>

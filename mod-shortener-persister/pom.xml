@@ -6,7 +6,7 @@
 	<groupId>io.stalk</groupId>
 	<artifactId>mod-shortener-persister</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.3</version>
+	<version>0.0.2</version>
 	<name>Project - mod-shortener-persister</name>
 	<url>http://maven.apache.org</url>
 
@@ -62,13 +62,6 @@
 	</repositories>
 
 	<dependencies>
-	
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>2.11.4</version>
-		</dependency>
-
 		<!--Vertx provided dependencies -->
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -101,6 +94,14 @@
 			<version>${vertx.testtools.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- libraries for the application modules -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.11.4</version>
+		</dependency>
+
 
 		<!-- Add any other dependencies that you want packaged into your module 
 			(in the lib dir) here as 'compile' dependencies. Here is an example <dependency> 
