@@ -63,9 +63,6 @@ public class ServerVerticle extends BusModBase implements Handler<HttpServerRequ
 			data.putString("action", "create");
 			data.putString("url", url);
 			
-			
-			System.out.println("URL :"+url);
-
 			eb.send("shortener.persister", data, 
 					new Handler<Message<JsonObject>>(){
 

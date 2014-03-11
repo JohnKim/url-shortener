@@ -1,15 +1,13 @@
 package io.stalk.mod.shortener.persister;
 
 import java.net.UnknownHostException;
-import java.util.concurrent.ConcurrentMap;
 
-import org.vertx.java.busmods.BusModBase;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Verticle;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -18,23 +16,29 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
-public class MongodbPersisterVerticle  extends BusModBase implements Handler<Message<JsonObject>>{
+public class MongodbPersisterVerticle_pre extends Verticle {
 
+	private JsonObject config;
 	private String address;
 	private String host;
 	private int port;
-
 	private MongoClient mongo;
 	private DB db;
+	private Logger logger;
+	private EventBus eb;
 
 	@Override
-	public void start(final Future<Void> startedResult) {
+	public void start() {
 
 		super.start();
 
-		address = getOptionalStringConfig("address", "shortener.persister");
-		host = getOptionalStringConfig("host", "localhost");
-		port = getOptionalIntConfig("port", 27017);
+		config = container.config();
+		logger = container.logger();
+		eb = vertx.eventBus();
+
+		address = config.getString("address") == null ? "shortener.persister" : config.getString("address");
+		host = config.getString("host") == null ? "localhost" : config.getString("host");
+		port = config.getNumber("port") == null ? 27017 : config.getNumber("port").intValue();
 
 		try {
 			ServerAddress mongoAddress = new ServerAddress(host, port);
@@ -46,21 +50,32 @@ public class MongodbPersisterVerticle  extends BusModBase implements Handler<Mes
 			e.printStackTrace();
 		}
 
-		eb.registerHandler(address, this, new AsyncResultHandler<Void>() {
+
+		logger.info(" >>> mongodbPersisterVerticle is registering event - "+address);
+
+		eb.registerHandler(address, new Handler<Message<JsonObject>>() {
 
 			@Override
-			public void handle(AsyncResult<Void> ar) {
-				if (!ar.succeeded()) {
-					ar.cause().printStackTrace();
-					startedResult.setFailure(ar.cause());
-				} else {
-					startedResult.setResult(null);
+			public void handle(Message<JsonObject> message) {
+				String action = message.body().getString("action");
+				switch (action) {
+				case "create":
+					createShortUrl(message);
+					break;
+
+				case "get":
+					getShortUrl(message);
+					break;
+
+				default:
+					JsonObject errMsg = new JsonObject().putString("status", "error").putString("message", "[action] must be specified!");
+					message.reply(errMsg);
 				}
 
-				logger.info(" >>> mongodb Persister is started");
 			}
-
 		});
+		
+		logger.info(" >>> mongodbPersister server is started.");
 
 	}
 
@@ -68,27 +83,6 @@ public class MongodbPersisterVerticle  extends BusModBase implements Handler<Mes
 	public void stop() {
 		if (mongo != null) {
 			mongo.close();
-		}
-	}
-
-	@Override
-	public void handle(Message<JsonObject> message) {
-
-		String action = message.body().getString("action");
-
-		printActionCount(action); // to debug or monitoring.
-
-		switch (action) {
-		case "create":
-			createShortUrl(message);
-			break;
-
-		case "get":
-			getShortUrl(message);
-			break;
-
-		default:
-			sendError(message, "[action] must be specified!");
 		}
 	}
 
@@ -101,10 +95,11 @@ public class MongodbPersisterVerticle  extends BusModBase implements Handler<Mes
 		DBObject res = urls.findOne(query);
 
 		if(res != null){
-			sendOK(message, new JsonObject(res.toString()));
+			message.reply(new JsonObject(res.toString()).putString("status", "ok"));
 		}else{
-			sendError(message, "NOT EXISTED.");
+			message.reply(new JsonObject().putString("status", "error").putString("message", "NOT EXISTED."));
 		}
+		
 
 	}
 
@@ -116,6 +111,8 @@ public class MongodbPersisterVerticle  extends BusModBase implements Handler<Mes
 		DBObject query = new BasicDBObject();
 		query.put("_id", "urlShortener");
 
+		logger.info(message.body().getString("url"));
+		
 		DBObject change = new BasicDBObject("seq", 1);
 		DBObject update = new BasicDBObject("$inc", change);
 
@@ -141,25 +138,5 @@ public class MongodbPersisterVerticle  extends BusModBase implements Handler<Mes
 
 		message.reply(reply);
 	}
-
-	private int printActionCount(String action){
-
-		ConcurrentMap<String, Integer> sharedMap = vertx.sharedData().getMap("count.action");
-		int _cnt = 0;
-		Integer _countObj = sharedMap.get(action);
-		if(_countObj == null) {
-			_cnt = 1;
-		}else{
-			_cnt = _countObj + 1;
-		}
-
-		sharedMap.put("create", _cnt);
-
-		System.out.println(action+" #"+_cnt);
-
-		return _cnt;
-	}
-
-
 
 }

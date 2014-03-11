@@ -2,7 +2,7 @@
 
   "main":"io.stalk.mod.shortener.server.ServerVerticle",
 
-  "description":"Mongodb Persister for url shortener",
+  "description":"API HTTP Server Module for url shortener",
   "licenses": ["The Apache Software License Version 2.0"],
   "author": "John Kim",
 
